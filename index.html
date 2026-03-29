@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CR7 Store Pro</title>
+
+<style>
+body {margin:0;font-family:Arial;background:#0a0a0a;color:white}
+
+/* NAV */
+nav {
+display:flex;justify-content:space-between;
+padding:15px;background:black;align-items:center;
+}
+
+.logo {color:#00ffcc;font-weight:bold;font-size:22px}
+
+button {cursor:pointer;border:none;padding:8px;border-radius:5px}
+
+/* GRID */
+.grid {
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;padding:20px;
+}
+
+.card {
+background:#111;padding:15px;border-radius:10px;
+transition:0.3s;
+}
+.card:hover {transform:scale(1.05);box-shadow:0 0 15px #00ffcc}
+
+img {width:100%;border-radius:10px}
+
+.precio {color:#00ffcc}
+
+/* PANEL */
+.panel {
+position:fixed;right:-350px;top:0;width:350px;height:100%;
+background:black;padding:20px;transition:0.4s;overflow:auto;
+}
+.panel.active {right:0}
+
+/* LOGIN */
+.login {
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.9);display:none;
+justify-content:center;align-items:center;
+}
+.login-box {
+background:#111;padding:20px;border-radius:10px;
+}
+input {
+display:block;margin:10px 0;padding:8px;width:200px;
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>
+<div class="logo">🔥 CR7 STORE PRO</div>
+
+<div>
+<button onclick="abrirLogin()">👤 Login</button>
+<button onclick="toggleCarrito()">🛒 (<span id="count">0</span>)</button>
+</div>
+</nav>
+
+<!-- PRODUCTOS -->
+<div class="grid">
+
+<div class="card">
+<img src="Cr7perfume.jpg">
+<h3>Perfume CR7</h3>
+<p class="precio">$120000</p>
+<button onclick="add('Perfume CR7',120000)">Agregar</button>
+</div>
+
+<div class="card">
+<img src="Cr7botines.jpg">
+<h3>Botines CR7</h3>
+<p class="precio">$350000</p>
+<button onclick="add('Botines CR7',350000)">Agregar</button>
+</div>
+
+<div class="card">
+<img src="Cr7camisa.jpg">
+<h3>Camisa CR7</h3>
+<p class="precio">$90000</p>
+<button onclick="add('Camisa CR7',90000)">Agregar</button>
+</div>
+
+<div class="card">
+<img src="Cr7gorra.jpg">
+<h3>Gorra CR7</h3>
+<p class="precio">$70000</p>
+<button onclick="add('Gorra CR7',70000)">Agregar</button>
+</div>
+
+</div>
+
+<!-- CARRITO -->
+<div class="panel" id="cart">
+<h2>Carrito</h2>
+<ul id="lista"></ul>
+<h3>Total: $<span id="total">0</span></h3>
+<button onclick="pagar()">💳 Pagar</button>
+</div>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+<div class="login-box">
+<h2>Login</h2>
+<input id="user" placeholder="Usuario">
+<input id="pass" placeholder="Contraseña" type="password">
+<button onclick="login()">Entrar</button>
+</div>
+</div>
+
+<script>
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let usuario = localStorage.getItem("usuario");
+
+/* ACTUALIZAR */
+function update(){
+let lista=document.getElementById("lista");
+lista.innerHTML="";
+let total=0;
+
+carrito.forEach((p,i)=>{
+let li=document.createElement("li");
+li.innerHTML=`${p.nombre} x${p.cant} - $${p.precio*p.cant}
+<button onclick="remove(${i})">❌</button>`;
+lista.appendChild(li);
+total+=p.precio*p.cant;
+});
+
+document.getElementById("count").textContent=carrito.length;
+document.getElementById("total").textContent=total;
+
+localStorage.setItem("carrito",JSON.stringify(carrito));
+}
+
+/* AGREGAR */
+function add(nombre,precio){
+let existe=carrito.find(p=>p.nombre===nombre);
+
+if(existe){existe.cant++}
+else{carrito.push({nombre,precio,cant:1})}
+
+update();
+}
+
+/* ELIMINAR */
+function remove(i){
+carrito.splice(i,1);
+update();
+}
+
+/* CARRITO */
+function toggleCarrito(){
+document.getElementById("cart").classList.toggle("active");
+}
+
+/* LOGIN */
+function abrirLogin(){
+document.getElementById("login").style.display="flex";
+}
+
+function login(){
+let user=document.getElementById("user").value;
+localStorage.setItem("usuario",user);
+alert("Bienvenido "+user);
+document.getElementById("login").style.display="none";
+}
+
+/* PAGO */
+function pagar(){
+if(!usuario){
+alert("Debes iniciar sesión");
+abrirLogin();
+return;
+}
+
+if(carrito.length===0){
+alert("Carrito vacío");
+return;
+}
+
+alert("Compra realizada con éxito 🔥");
+carrito=[];
+update();
+}
+
+update();
+</script>
+
+</body>
+</html>
